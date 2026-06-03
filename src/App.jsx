@@ -22,63 +22,6 @@ const useT = () => {
   return mkT(m)
 }
 
-function EmailGate({ onUnlock, industries, zip }) {
-  const [email, setEmail] = useState('')
-  const [role, setRole] = useState('investor')
-  const [loading, setLoading] = useState(false)
-  const [err, setErr] = useState('')
-  const t = useT()
-
-  const submit = async () => {
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErr('Valid email required')
-      return
-    }
-    setLoading(true)
-    setErr('')
-    try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, role, zip, industries: [...industries] })
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setErr(data.error || 'Failed')
-        setLoading(false)
-        return
-      }
-      localStorage.setItem('msi_unlocked', '1')
-      onUnlock()
-    } catch (e) {
-      setErr('Network error')
-      setLoading(false)
-    }
-  }
-
-  return <div style={{ position: 'fixed', inset: 0, zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.9)' }}>
-    <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 20, padding: '40px 32px', maxWidth: 480, width: '100%' }}>
-      <h2 style={{ fontFamily: 'Playfair Display,serif', fontSize: 28, fontWeight: 900, color: t.text, marginBottom: 16 }}>See investor insights</h2>
-      <p style={{ fontFamily: 'Georgia,serif', fontSize: 14, color: t.textSec, lineHeight: 1.7, marginBottom: 24 }}>Join hundreds of investors discovering Main Street opportunities.</p>
-      <div style={{ marginBottom: 16 }}>
-        <input value={email} onChange={e => { setEmail(e.target.value); setErr('') }} placeholder="investor@example.com" style={{ width: '100%', padding: '14px', background: t.bgInput, border: `1px solid ${t.border}`, borderRadius: 10, color: t.text, fontSize: 12, boxSizing: 'border-box' }} />
-      </div>
-      <div style={{ marginBottom: 20 }}>
-        <select value={role} onChange={e => setRole(e.target.value)} style={{ width: '100%', padding: '12px', background: t.bgInput, border: `1px solid ${t.border}`, borderRadius: 10, color: t.text, fontSize: 12, boxSizing: 'border-box', cursor: 'pointer' }}>
-          <option value="investor">Investor</option>
-          <option value="owner">Business Owner</option>
-          <option value="broker">Broker</option>
-          <option value="curious">Just Curious</option>
-        </select>
-      </div>
-      {err && <div style={{ fontSize: 9, color: t.red, marginBottom: 16 }}>{err}</div>}
-      <button onClick={submit} disabled={loading} style={{ width: '100%', padding: '16px', background: 'linear-gradient(135deg,#0066cc,#00aadd)', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 12, fontWeight: 700, color: '#fff', opacity: loading ? 0.7 : 1 }}>
-        {loading ? 'UNLOCKING...' : 'UNLOCK RESULTS'}
-      </button>
-    </div>
-  </div>
-}
-
 function InquiryModal({ business, industries, onClose }) {
   const [email, setEmail] = useState('')
   const [note, setNote] = useState('')
@@ -116,10 +59,10 @@ function InquiryModal({ business, industries, onClose }) {
   if (step === 1) {
     return <div style={{ position: 'fixed', inset: 0, zIndex: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.75)' }}>
       <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 20, padding: '32px 28px', maxWidth: 440, width: '100%' }}>
-        <h2 style={{ fontFamily: 'Playfair Display,serif', fontSize: 22, fontWeight: 900, color: t.text, marginBottom: 10 }}>{business.name}</h2>
-        <p style={{ fontFamily: 'Georgia,serif', fontSize: 13, color: t.textSec, lineHeight: 1.7, marginBottom: 20 }}>Register your interest. We will notify the owner if they claim their profile.</p>
+        <h2 style={{ fontFamily: 'Playfair Display,serif', fontSize: 22, fontWeight: 900, color: t.text, marginBottom: 10 }}>Express Interest</h2>
+        <p style={{ fontFamily: 'Georgia,serif', fontSize: 13, color: t.textSec, lineHeight: 1.7, marginBottom: 20 }}>{business.name}</p>
         <div style={{ marginBottom: 16 }}>
-          <input value={email} onChange={e => { setEmail(e.target.value); setErr('') }} placeholder="investor@example.com" style={{ width: '100%', padding: '12px', background: t.bgInput, border: `1px solid ${t.border}`, borderRadius: 8, color: t.text, fontSize: 12, boxSizing: 'border-box' }} />
+          <input value={email} onChange={e => { setEmail(e.target.value); setErr('') }} placeholder="your@email.com" style={{ width: '100%', padding: '12px', background: t.bgInput, border: `1px solid ${t.border}`, borderRadius: 8, color: t.text, fontSize: 12, boxSizing: 'border-box' }} />
         </div>
         <div style={{ marginBottom: 16 }}>
           <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Optional message..." style={{ width: '100%', padding: '12px', background: t.bgInput, border: `1px solid ${t.border}`, borderRadius: 8, color: t.text, fontSize: 12, height: 80, resize: 'none', boxSizing: 'border-box' }} />
@@ -139,7 +82,7 @@ function InquiryModal({ business, industries, onClose }) {
     <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 20, padding: '32px 28px', maxWidth: 440, width: '100%', textAlign: 'center' }}>
       <div style={{ fontSize: 40, marginBottom: 16 }}>✓</div>
       <h2 style={{ fontFamily: 'Playfair Display,serif', fontSize: 20, fontWeight: 900, color: '#0066cc', marginBottom: 12 }}>Interest Recorded</h2>
-      <p style={{ fontFamily: 'Georgia,serif', fontSize: 13, color: t.textSec, lineHeight: 1.7, marginBottom: 20 }}>We have logged your interest.</p>
+      <p style={{ fontFamily: 'Georgia,serif', fontSize: 13, color: t.textSec, lineHeight: 1.7, marginBottom: 20 }}>We've logged your interest.</p>
       <button onClick={onClose} style={{ width: '100%', padding: '15px', background: 'linear-gradient(135deg,#0066cc,#0044aa)', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 12, fontWeight: 700, color: '#fff' }}>
         DONE
       </button>
@@ -156,8 +99,6 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [favs, setFavs] = useState(new Set())
   const [selBiz, setSelBiz] = useState(null)
-  const [showGate, setShowGate] = useState(false)
-  const [unlocked, setUnlocked] = useState(() => !!localStorage.getItem('msi_unlocked'))
   const [showInquiry, setShowInquiry] = useState(false)
   const [tab, setTab] = useState('search')
 
@@ -221,7 +162,7 @@ export default function App() {
         </div>
       </div>
 
-      <button onClick={() => { if (industries.size === 0 || !zip) return; if (!unlocked) { setShowGate(true); return } doSearch(industries, zip) }} disabled={industries.size === 0 || !zip} style={{ width: '100%', padding: '16px', background: industries.size > 0 && zip ? 'linear-gradient(135deg,#0066cc,#00aadd)' : '#444', border: 'none', borderRadius: 10, cursor: industries.size > 0 && zip ? 'pointer' : 'not-allowed', fontFamily: 'Space Mono,monospace', fontSize: 13, fontWeight: 700, color: '#fff', letterSpacing: 1 }}>
+      <button onClick={() => { if (industries.size === 0 || !zip) return; doSearch(industries, zip) }} disabled={industries.size === 0 || !zip} style={{ width: '100%', padding: '16px', background: industries.size > 0 && zip ? 'linear-gradient(135deg,#0066cc,#00aadd)' : '#444', border: 'none', borderRadius: 10, cursor: industries.size > 0 && zip ? 'pointer' : 'not-allowed', fontFamily: 'Space Mono,monospace', fontSize: 13, fontWeight: 700, color: '#fff', letterSpacing: 1 }}>
         SEARCH →
       </button>
     </div>}
@@ -269,6 +210,5 @@ export default function App() {
     </div>}
 
     {showInquiry && selBiz && <InquiryModal business={selBiz} industries={[...industries]} onClose={() => { setShowInquiry(false); setSelBiz(null) }} />}
-    {showGate && <EmailGate onUnlock={() => setUnlocked(true)} industries={[...industries]} zip={zip} />}
   </div>
 }
