@@ -167,8 +167,8 @@ export default function App() {
       </button>
     </div>}
 
-    {tab === 'results' && <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+    {tab === 'results' && <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
         <h2 style={{ fontFamily: 'Playfair Display,serif', fontSize: 28, fontWeight: 900, margin: 0 }}>
           {[...industries].map(i => IND[i]?.label).join(' + ')} in {zip}
         </h2>
@@ -177,32 +177,76 @@ export default function App() {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 16, marginBottom: 32 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         {loading ? <div style={{ textAlign: 'center', padding: '40px', color: t.textMut }}>Loading...</div> : bizList.map(b => (
-          <div key={b.id} onClick={() => { setSelBiz(b); setShowInquiry(true) }} style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 12, padding: 16, cursor: 'pointer' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 12 }}>
-              <div>
-                <h3 style={{ fontFamily: 'Playfair Display,serif', fontSize: 16, fontWeight: 900, margin: '0 0 4px 0' }}>{b.name}</h3>
-                <div style={{ fontSize: 9, color: t.textMut }}>⭐ {b.rating.toFixed(1)} ({b.reviewCount})</div>
-              </div>
-              <button onClick={e => { e.stopPropagation(); toggleFav(b.id) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18 }}>
-                {favs.has(b.id) ? '❤️' : '🤍'}
-              </button>
+          <div key={b.id} onClick={() => { setSelBiz(b); setShowInquiry(true) }} style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 12, padding: 20, cursor: 'pointer', display: 'grid', gridTemplateColumns: '200px 1fr', gap: 20, transition: 'border-color 0.2s' }} onMouseEnter={e => e.currentTarget.style.borderColor = t.accent} onMouseLeave={e => e.currentTarget.style.borderColor = t.border}>
+            
+            {/* Photo placeholder */}
+            <div style={{ background: t.bgInput, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 150, fontSize: 12, color: t.textMut, fontFamily: 'Space Mono,monospace' }}>
+              📷 Photo
             </div>
-            <div style={{ fontSize: 8, color: t.textMut, marginBottom: 12 }}>{b.address}</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
+
+            {/* Right side: name, address, signals */}
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              
+              {/* Header */}
               <div>
-                <div style={{ fontSize: 7, color: t.textMut, marginBottom: 2 }}>REVENUE</div>
-                <div style={{ fontSize: 12, fontWeight: 700 }}>{fmtMoney(b.rev)}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 8 }}>
+                  <div>
+                    <h3 style={{ fontFamily: 'Playfair Display,serif', fontSize: 20, fontWeight: 900, margin: '0 0 4px 0' }}>{b.name}</h3>
+                    <div style={{ fontSize: 8, color: t.textMut, fontFamily: 'Space Mono,monospace' }}>{b.address}</div>
+                  </div>
+                  <button onClick={e => { e.stopPropagation(); toggleFav(b.id) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20 }}>
+                    {favs.has(b.id) ? '❤️' : '🤍'}
+                  </button>
+                </div>
               </div>
-              <div>
-                <div style={{ fontSize: 7, color: t.textMut, marginBottom: 2 }}>SDE</div>
-                <div style={{ fontSize: 12, fontWeight: 700 }}>{fmtMoney(b.sde)}</div>
+
+              {/* Key Signals Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+                
+                {/* Signal Score (hero) */}
+                <div style={{ background: t.bgInput, padding: 12, borderRadius: 8 }}>
+                  <div style={{ fontSize: 7, color: t.textMut, fontFamily: 'Space Mono,monospace', letterSpacing: 1, marginBottom: 4 }}>SIGNAL SCORE</div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: '#0066cc' }}>{b.sig}</div>
+                  <div style={{ fontSize: 6, color: t.textDim, marginTop: 4 }}>Investor interest</div>
+                </div>
+
+                {/* Revenue */}
+                <div style={{ background: t.bgInput, padding: 12, borderRadius: 8 }}>
+                  <div style={{ fontSize: 7, color: t.textMut, fontFamily: 'Space Mono,monospace', letterSpacing: 1, marginBottom: 4 }}>REVENUE</div>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>{fmtMoney(b.rev)}</div>
+                  <div style={{ fontSize: 6, color: t.textDim, marginTop: 4 }}>Est. annual</div>
+                </div>
+
+                {/* Rating */}
+                <div style={{ background: t.bgInput, padding: 12, borderRadius: 8 }}>
+                  <div style={{ fontSize: 7, color: t.textMut, fontFamily: 'Space Mono,monospace', letterSpacing: 1, marginBottom: 4 }}>RATING</div>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>⭐ {b.rating.toFixed(1)}</div>
+                  <div style={{ fontSize: 6, color: t.textDim, marginTop: 4 }}>{b.reviewCount} reviews</div>
+                </div>
+
+                {/* Years in Business */}
+                <div style={{ background: t.bgInput, padding: 12, borderRadius: 8 }}>
+                  <div style={{ fontSize: 7, color: t.textMut, fontFamily: 'Space Mono,monospace', letterSpacing: 1, marginBottom: 4 }}>ESTABLISHED</div>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>{b.yrs} yrs</div>
+                  <div style={{ fontSize: 6, color: t.textDim, marginTop: 4 }}>In operation</div>
+                </div>
+
+                {/* SDE (Owner earnings) */}
+                <div style={{ background: t.bgInput, padding: 12, borderRadius: 8 }}>
+                  <div style={{ fontSize: 7, color: t.textMut, fontFamily: 'Space Mono,monospace', letterSpacing: 1, marginBottom: 4 }}>OWNER EARNINGS</div>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>{fmtMoney(b.sde)}</div>
+                  <div style={{ fontSize: 6, color: t.textDim, marginTop: 4 }}>Est. SDE</div>
+                </div>
+
               </div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 12, borderTop: `1px solid ${t.border}`, fontSize: 9, color: t.textMut }}>
-              <div>{b.yrs} yrs</div>
-              <div style={{ fontWeight: 700, color: '#0066cc', fontSize: 14 }}>{b.sig}</div>
+
+              {/* Footer: data attribution */}
+              <div style={{ fontSize: 6, color: t.textDim, fontFamily: 'Space Mono,monospace', marginTop: 12, paddingTop: 12, borderTop: `1px solid ${t.border}` }}>
+                Data: Google Places (ratings, reviews) | Est. Revenue (algorithmic) | Signal Score (investor interest)
+              </div>
+
             </div>
           </div>
         ))}
